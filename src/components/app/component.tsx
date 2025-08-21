@@ -55,7 +55,7 @@ export function LiveTranscriptionPlugin(
     GET_CAPTION_ACTIVE_LOCALES,
   );
 
-  const { data: captionSettings } = pluginApi.useCustomSubscription<
+  const { data: captionSettings } = pluginApi.useCustomQuery<
   CaptionSettingsGraphqlResponse>(
     GET_CAPTION_SETTINGS,
   );
@@ -88,12 +88,13 @@ export function LiveTranscriptionPlugin(
   }, [captionActiveLocalesResult, intl, permissionToLoad]);
 
   useEffect(() => {
-    if (captionSettings && captionSettings.meeting.length >= 0) {
-      const liveTranscriptionDisabled = captionSettings.meeting[0].disabledFeatures.includes(
+    if (captionSettings) {
+      const meetingSettings = captionSettings.meeting[0];
+      const liveTranscriptionDisabled = meetingSettings.disabledFeatures.includes(
         LIVE_TRANSCRIPTION_DISABLED_FEATURE,
       );
-      const captionEnabled = captionSettings.meeting[0].captionSettings.audioCaptionEnabled
-        && captionSettings.meeting[0].captionSettings.audioCaptionAvailableLanguages.length >= 0;
+      const captionEnabled = meetingSettings.captionSettings.audioCaptionEnabled
+        && meetingSettings.captionSettings.audioCaptionAvailableLanguages.length >= 0;
 
       if (!captionEnabled || liveTranscriptionDisabled) setPermissionToLoad(false);
 

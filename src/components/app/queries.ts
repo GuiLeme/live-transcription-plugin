@@ -7,7 +7,7 @@ subscription getCaptionLocale {
 `;
 
 export const GET_CAPTION_SETTINGS = `
-subscription captionInformation {
+query captionInformation {
   meeting {
     disabledFeatures
     captionSettings: clientSettings {
