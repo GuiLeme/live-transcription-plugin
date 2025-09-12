@@ -34,7 +34,6 @@ module.exports = {
       devServer.app.get('/manifest.json', (req, res) => {
         res.sendFile(path.resolve(__dirname, 'manifest.json'));
       });
-
       return middlewares;
     },
   },
