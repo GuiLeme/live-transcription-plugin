@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { CaptionRowProps, ModalAvatarProps } from './types';
+import { CaptionRowProps, UserAvatarInitialsProps } from './types';
 
-export const UserAvatarInitials = styled.div<ModalAvatarProps>`
+export const UserAvatarInitials = styled.div<UserAvatarInitialsProps>`
   background-color: ${({ background }) => background};
   height: 2rem;
   width: 2rem;

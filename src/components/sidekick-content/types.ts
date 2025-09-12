@@ -24,6 +24,6 @@ export interface CaptionRowProps {
   hasMarginBottom: boolean;
 }
 
-export interface ModalAvatarProps {
+export interface UserAvatarInitialsProps {
   background: string;
 }
