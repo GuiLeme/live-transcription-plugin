@@ -62,7 +62,9 @@ export function LiveTranscriptionPlugin(
 
   useEffect(() => {
     if (captionActiveLocalesResult && intl && permissionToLoad) {
-      const sidekickPanelsList = captionActiveLocalesResult.caption_activeLocales.map(
+      const sidekickPanelsList = captionActiveLocalesResult.caption_activeLocales
+      .filter((activeCaptionLocale) => activeCaptionLocale.locale !== '')
+      .map(
         (activeCaptionLocale) => new GenericContentSidekickArea({
           name: intl.formatMessage(intlMessages.sidekickMenuTitle, {
             0: activeCaptionLocale.locale,
