@@ -55,7 +55,7 @@ Lastly, make sure that `liveTranscription` is not on the `disabledFeatures` list
 To build the plugin for production use, follow these steps:
 
 ```bash
-cd $HOME/src/plugin-live-transcription
+cd $HOME/src/bbb-plugin-live-transcription
 npm ci
 npm run build-bundle
 ```

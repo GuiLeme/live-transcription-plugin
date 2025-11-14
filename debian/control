@@ -4,12 +4,14 @@ Priority: extra
 Maintainer: Anton Georgiev <anton.georgiev@blindsidenetworks.com>
 Build-Depends: debhelper (>= 13), nodejs (>= 18)
 Standards-Version: 4.1.4
-Homepage: https://github.com/bigbluebutton/plugin-live-transcription
+Homepage: https://github.com/bigbluebutton/bbb-plugin-live-transcription
 
 Package: bbb-plugin-live-transcription
 Architecture: all
 Depends: ${misc:Depends}, nodejs
-Description: Share a webpage with all session participants
- An official BigBlueButton plugin which allows
- the presenter to display a web page to
- all viewers inside of a session.
+Description: Live transcription in BigBlueButton
+ An official BigBlueButton plugin which provides
+ a panel to the client where the live transcription
+ is visible. Users joining via supported browsers
+ (Google Chrome currently) can opt in to have their
+ browser provide transcription as they speak.
