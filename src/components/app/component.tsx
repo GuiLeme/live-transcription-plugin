@@ -62,30 +62,34 @@ export function LiveTranscriptionPlugin(
 
   useEffect(() => {
     if (captionActiveLocalesResult && intl && permissionToLoad) {
-      const sidekickPanelsList = captionActiveLocalesResult.caption_activeLocales
-      .filter((activeCaptionLocale) => activeCaptionLocale.locale !== '')
-      .map(
-        (activeCaptionLocale) => new GenericContentSidekickArea({
-          id: `live-transcription-${activeCaptionLocale.locale}-${uuid}`,
-          name: intl.formatMessage(intlMessages.sidekickMenuTitle, {
-            0: activeCaptionLocale.locale,
-          }),
-          buttonIcon: 'closed_caption',
-          section: intl.formatMessage(intlMessages.sidekickSectionName),
-          open: false,
-          contentFunction: (element: HTMLElement) => {
-            const root = ReactDOM.createRoot(element);
-            root.render(
-              (<LiveTranscriptionSidekickContent
-                captionLocale={activeCaptionLocale.locale}
-                pluginApi={pluginApi}
-                intl={intl}
-              />),
-            );
-            return root;
-          },
-        }),
+      const uniqueActiveLocales = new Set(
+        captionActiveLocalesResult.caption_activeLocales
+          .map((activeCaptionLocale) => activeCaptionLocale.locale)
+          .filter((locale) => locale !== ''),
       );
+      const sidekickPanelsList = Array.from(uniqueActiveLocales)
+        .map(
+          (activeCaptionLocale) => new GenericContentSidekickArea({
+            id: `live-transcription-${activeCaptionLocale}-${uuid}`,
+            name: intl.formatMessage(intlMessages.sidekickMenuTitle, {
+              0: activeCaptionLocale,
+            }),
+            buttonIcon: 'closed_caption',
+            section: intl.formatMessage(intlMessages.sidekickSectionName),
+            open: false,
+            contentFunction: (element: HTMLElement) => {
+              const root = ReactDOM.createRoot(element);
+              root.render(
+                (<LiveTranscriptionSidekickContent
+                  captionLocale={activeCaptionLocale}
+                  pluginApi={pluginApi}
+                  intl={intl}
+                />),
+              );
+              return root;
+            },
+          }),
+        );
       pluginApi.setGenericContentItems([...sidekickPanelsList]);
     }
   }, [captionActiveLocalesResult, intl, permissionToLoad]);
