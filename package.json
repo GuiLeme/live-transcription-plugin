@@ -21,7 +21,10 @@
     "lint:watch": "watch 'yarn lint'",
     "test:unit": "vitest run",
     "test:unit:coverage": "vitest run --coverage",
-    "test:unit:watch": "vitest"
+    "test:unit:watch": "vitest",
+    "publish-plugin:dev": "bash scripts/copy-plugin-to-container.sh",
+    "test": "playwright test",
+    "test-chromium-ci": "CI=true playwright test --project=chromium"
   },
   "browserslist": {
     "production": [
