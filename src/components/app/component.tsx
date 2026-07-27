@@ -6,6 +6,11 @@ import { BbbPluginSdk, GenericContentSidekickArea, pluginLogger } from 'bigblueb
 import { GET_CAPTION_ACTIVE_LOCALES, GET_CAPTION_SETTINGS } from './queries';
 import { CaptionActiveLocaleGraphqlResponse, CaptionSettingsGraphqlResponse, LiveTranscriptionPluginProps } from './types';
 import { LiveTranscriptionSidekickContent } from '../sidekick-content/component';
+import {
+  getUniqueActiveLocales,
+  isCaptionEnabled,
+  isLiveTranscriptionDisabled,
+} from './utils';
 
 const intlMessages = defineMessages({
   sidekickSectionName: {
@@ -19,8 +24,6 @@ const intlMessages = defineMessages({
     defaultMessage: 'Live Transcription ({0})',
   },
 });
-
-const LIVE_TRANSCRIPTION_DISABLED_FEATURE = 'liveTranscription';
 
 const LOCALE_REQUEST_OBJECT = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development')
   ? {
@@ -62,12 +65,10 @@ export function LiveTranscriptionPlugin(
 
   useEffect(() => {
     if (captionActiveLocalesResult && intl && permissionToLoad) {
-      const uniqueActiveLocales = new Set(
-        captionActiveLocalesResult.caption_activeLocales
-          .map((activeCaptionLocale) => activeCaptionLocale.locale)
-          .filter((locale) => locale !== ''),
+      const uniqueActiveLocales = getUniqueActiveLocales(
+        captionActiveLocalesResult.caption_activeLocales,
       );
-      const sidekickPanelsList = Array.from(uniqueActiveLocales)
+      const sidekickPanelsList = uniqueActiveLocales
         .map(
           (activeCaptionLocale) => new GenericContentSidekickArea({
             id: `live-transcription-${activeCaptionLocale}-${uuid}`,
@@ -97,11 +98,10 @@ export function LiveTranscriptionPlugin(
   useEffect(() => {
     if (captionSettings) {
       const meetingSettings = captionSettings.meeting[0];
-      const liveTranscriptionDisabled = meetingSettings.disabledFeatures.includes(
-        LIVE_TRANSCRIPTION_DISABLED_FEATURE,
+      const liveTranscriptionDisabled = isLiveTranscriptionDisabled(
+        meetingSettings.disabledFeatures,
       );
-      const captionEnabled = meetingSettings.captionSettings.audioCaptionEnabled
-        && meetingSettings.captionSettings.audioCaptionAvailableLanguages.length >= 0;
+      const captionEnabled = isCaptionEnabled(meetingSettings.captionSettings);
 
       if (!captionEnabled || liveTranscriptionDisabled) setPermissionToLoad(false);
 

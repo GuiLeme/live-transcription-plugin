@@ -6,6 +6,11 @@ import { defineMessages } from 'react-intl';
 import * as Styled from './styles';
 import { CaptionGraphqlResult, LiveTranscriptionSidekickContentProps } from './types';
 import { GET_CAPTIONS } from './queries';
+import {
+  formatCaptionsForDownload,
+  getAvatarInitials,
+  isNearBottom,
+} from './utils';
 
 const intlMessages = defineMessages({
   downloadButtonLabel: {
@@ -56,22 +61,18 @@ export function LiveTranscriptionSidekickContent(
     const container = containerRef.current;
     if (!container) return;
 
-    const nearBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+    const nearBottom = isNearBottom(
+      container.scrollHeight,
+      container.scrollTop,
+      container.clientHeight,
+    );
     setIsAtBottom(nearBottom);
   };
 
   const downloadLiveTranscription = () => {
     if (!captions?.caption_history) return;
 
-    const formatDate = (isoDate: string) => {
-      const date = new Date(isoDate);
-      return date;
-    };
-
-    const textContent = captions.caption_history.map((c) => {
-      const timestamp = formatDate(c.createdAt);
-      return `${c.user.name} (${timestamp}): ${c.captionText}`;
-    }).join('\n');
+    const textContent = formatCaptionsForDownload(captions.caption_history);
 
     const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -86,19 +87,28 @@ export function LiveTranscriptionSidekickContent(
 
   const captionsLength = captions?.caption_history ? captions?.caption_history.length : 0;
   return (
-    <Styled.Container>
+    <Styled.Container data-test="liveTranscriptionContainer">
       <Styled.Header>
-        <Styled.HeaderTitle>{locale}</Styled.HeaderTitle>
-        <Styled.DownloadButton type="button" onClick={downloadLiveTranscription}>
+        <Styled.HeaderTitle data-test="liveTranscriptionHeaderTitle">{locale}</Styled.HeaderTitle>
+        <Styled.DownloadButton
+          data-test="liveTranscriptionDownloadButton"
+          type="button"
+          onClick={downloadLiveTranscription}
+        >
           {intl.formatMessage(intlMessages.downloadButtonLabel)}
         </Styled.DownloadButton>
       </Styled.Header>
       <Styled.ScrollAreaWrapper>
-        <Styled.ScrollArea ref={containerRef} onScroll={handleScroll}>
+        <Styled.ScrollArea
+          data-test="liveTranscriptionScrollArea"
+          ref={containerRef}
+          onScroll={handleScroll}
+        >
           {captions?.caption_history?.map((c, index) => (
             <Styled.CaptionRow
               hasMarginBottom={index !== captionsLength - 1}
               key={c.captionId}
+              data-test="liveTranscriptionCaptionRow"
             >
               <Styled.UserHeader>
                 <Styled.UserInfo>
@@ -114,10 +124,12 @@ export function LiveTranscriptionSidekickContent(
                     />
                   ) : (
                     <Styled.UserAvatarInitials background={c.user?.color}>
-                      {c.user.name.slice(0, 2)}
+                      {getAvatarInitials(c.user.name)}
                     </Styled.UserAvatarInitials>
                   )}
-                  <Styled.UserName>{c.user.name}</Styled.UserName>
+                  <Styled.UserName data-test="liveTranscriptionUserName">
+                    {c.user.name}
+                  </Styled.UserName>
                 </Styled.UserInfo>
 
                 <Styled.Timestamp>
@@ -126,7 +138,9 @@ export function LiveTranscriptionSidekickContent(
               </Styled.UserHeader>
 
               <Styled.CaptionContent>
-                <Styled.CaptionText>{c.captionText}</Styled.CaptionText>
+                <Styled.CaptionText data-test="liveTranscriptionCaptionText">
+                  {c.captionText}
+                </Styled.CaptionText>
               </Styled.CaptionContent>
             </Styled.CaptionRow>
           ))}
@@ -134,7 +148,11 @@ export function LiveTranscriptionSidekickContent(
       </Styled.ScrollAreaWrapper>
 
       {!isAtBottom && (
-        <Styled.ScrollButton type="button" onClick={scrollToBottom}>
+        <Styled.ScrollButton
+          data-test="liveTranscriptionScrollButton"
+          type="button"
+          onClick={scrollToBottom}
+        >
           {intl.formatMessage(intlMessages.scrollButtonLabel)}
         </Styled.ScrollButton>
       )}
